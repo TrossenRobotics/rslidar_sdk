@@ -30,34 +30,21 @@ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWIS
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************************************************/
 
-#include "manager/node_manager.hpp"
-
-#include <rs_driver/macro/version.hpp>
 #include <signal.h>
 
-#ifdef ROS_FOUND
-#include <ros/ros.h>
-#include <ros/package.h>
-#elif ROS2_FOUND
+#include <manager/node_manager.hpp>
 #include <rclcpp/rclcpp.hpp>
-#endif
+#include <rs_driver/macro/version.hpp>
 
 using namespace robosense::lidar;
 
-#ifdef ROS2_FOUND
 std::mutex g_mtx;
 std::condition_variable g_cv;
-#endif
 
 static void sigHandler(int sig)
 {
   RS_MSG << "RoboSense-LiDAR-Driver is stopping....." << RS_REND;
-
-#ifdef ROS_FOUND
-  ros::shutdown();
-#elif ROS2_FOUND
   g_cv.notify_all();
-#endif
 }
 
 int main(int argc, char** argv)
@@ -72,31 +59,26 @@ int main(int argc, char** argv)
   RS_TITLE << "**********                                    **********" << RS_REND;
   RS_TITLE << "********************************************************" << RS_REND;
 
-#ifdef ROS_FOUND
-  ros::init(argc, argv, "rslidar_sdk_node", ros::init_options::NoSigintHandler);
-#elif ROS2_FOUND
   rclcpp::init(argc, argv);
-#endif
 
   std::string config_path;
-
-#ifdef RUN_IN_ROS_WORKSPACE
-   config_path = ros::package::getPath("thermal_inspection_ugv_control");
-#else
-   config_path = (std::string)PROJECT_PATH;
-#endif
-
-   config_path += "/config/rslidar.yaml";
-
-#ifdef ROS_FOUND
-  ros::NodeHandle priv_hh("~");
-  std::string path;
-  priv_hh.param("config_path", path, std::string(""));
-  if (!path.empty())
+  try
   {
-    config_path = path;
+    config_path = argv[1];
   }
-#endif
+  catch (...)
+  {
+    RS_ERROR << "Missing Config File Path" << RS_REND;
+    return -1;
+  }
+
+// #ifdef RUN_IN_ROS_WORKSPACE
+//    config_path = ros::package::getPath("thermal_inspection_ugv_control");
+// #else
+//    config_path = (std::string)PROJECT_PATH;
+// #endif
+
+  config_path += "/rslidar.yaml";
 
   YAML::Node config;
   try
@@ -105,7 +87,7 @@ int main(int argc, char** argv)
   }
   catch (...)
   {
-    RS_ERROR << "The format of config file " << config_path 
+    RS_ERROR << "The format of config file " << config_path
       << " is wrong. Please check (e.g. indentation)." << RS_REND;
     return -1;
   }
@@ -116,12 +98,8 @@ int main(int argc, char** argv)
 
   RS_MSG << "RoboSense-LiDAR-Driver is running....." << RS_REND;
 
-#ifdef ROS_FOUND
-  ros::spin();
-#elif ROS2_FOUND
   std::unique_lock<std::mutex> lck(g_mtx);
   g_cv.wait(lck);
-#endif
 
   return 0;
 }

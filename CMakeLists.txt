@@ -164,8 +164,8 @@ include_directories(${rs_driver_INCLUDE_DIRS})
 #========================
 
 add_executable(rslidar_sdk_node
-            #    node/trossen_rslidar_node.cpp
-                node/rslidar_sdk_node.cpp
+               node/trossen_rslidar_node.cpp
+                # node/rslidar_sdk_node.cpp
                 src/manager/node_manager.cpp)
 
 target_link_libraries(rslidar_sdk_node                   
