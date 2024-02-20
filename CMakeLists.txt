@@ -138,7 +138,7 @@ if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
   find_package(sensor_msgs REQUIRED)
   find_package(rslidar_msg REQUIRED)
   find_package(std_msgs REQUIRED)
-  find_package(thermal_inspection_ugv_control REQUIRED)
+#   find_package(thermal_inspection_ugv_control REQUIRED)
 
 else(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
 
@@ -164,8 +164,9 @@ include_directories(${rs_driver_INCLUDE_DIRS})
 #========================
 
 add_executable(rslidar_sdk_node
-               node/trossen_rslidar_node.cpp
-               src/manager/node_manager.cpp)
+            #    node/trossen_rslidar_node.cpp
+                node/rslidar_sdk_node.cpp
+                src/manager/node_manager.cpp)
 
 target_link_libraries(rslidar_sdk_node                   
                       ${YAML_CPP_LIBRARIES}
