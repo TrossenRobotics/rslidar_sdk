@@ -10,7 +10,7 @@ set(POINT_TYPE XYZI)
 #=======================================
 # Compile setup (ORIGINAL, CATKIN, COLCON)
 #=======================================
-set(COMPILE_METHOD CATKIN)
+set(COMPILE_METHOD COLCON)
 
 option(ENABLE_TRANSFORM "Enable transform functions" OFF)
 if(${ENABLE_TRANSFORM})
@@ -137,7 +137,8 @@ if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
   find_package(ament_cmake REQUIRED)
   find_package(sensor_msgs REQUIRED)
   find_package(rslidar_msg REQUIRED)
-  find_package(std_msgs REQUIRED)                      
+  find_package(std_msgs REQUIRED)
+  find_package(thermal_inspection_ugv_control REQUIRED)
 
 else(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
 
@@ -163,7 +164,7 @@ include_directories(${rs_driver_INCLUDE_DIRS})
 #========================
 
 add_executable(rslidar_sdk_node
-               node/rslidar_sdk_node.cpp
+               node/trossen_rslidar_node.cpp
                src/manager/node_manager.cpp)
 
 target_link_libraries(rslidar_sdk_node                   
