@@ -3,7 +3,7 @@
   <name>rslidar_sdk</name>
   <version>1.5.0</version>
   <description>The rslidar_sdk package</description>
-  <maintainer email="ron.zheng@robosense.cn">robosense</maintainer>
+  <maintainer email="trsupport@trossenrobotics.com">Trossen Robotics</maintainer>
   <license>BSD</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
 

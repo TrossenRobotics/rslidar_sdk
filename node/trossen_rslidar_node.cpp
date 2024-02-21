@@ -51,7 +51,7 @@ void show_usage(std::string name)
 {
   std::cerr << "Usage: " << name << " <option(s)> SOURCES"
             << "Options:\n"
-            << "\t--config-path\t\tPass the config file absolute path (Required argument)\n"
+            << "\t--config-path\t\tPass the config file absolute path\n"
             << std::endl;
 }
 
@@ -91,7 +91,7 @@ int main(int argc, char ** argv)
   std::string config_path;
   config_path = arg_parser(argc, argv);
   if (config_path == "") {
-    config_path = (std::string)PROJECT_PATH;
+    config_path = static_cast<std::string>(PROJECT_PATH);
     config_path += "/config/config.yaml";
   } else {
     config_path += "/rslidar.yaml";
