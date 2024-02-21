@@ -74,61 +74,14 @@ elseif(${POINT_TYPE} STREQUAL "XYZIRT")
   add_definitions(-DPOINT_TYPE_XYZIRT)
 endif()
 
-message(=============================================================)
-message("-- POINT_TYPE is ${POINT_TYPE}")
-message(=============================================================)
-
 #========================
 # Dependencies Setup
 #========================
-
-#ROS#
-find_package(roscpp 1.12 QUIET)
-
-if(roscpp_FOUND)
-
-  message(=============================================================)
-  message("-- ROS Found. ROS Support is turned On.")
-  message(=============================================================)
-
-  add_definitions(-DROS_FOUND)
-
-  find_package(roslib QUIET)
-  include_directories(${roscpp_INCLUDE_DIRS} ${roslib_INCLUDE_DIRS})
-  set(ROS_LIBS ${roscpp_LIBRARIES} ${roslib_LIBRARIES})
-
-  #Catkin#
-  if(${COMPILE_METHOD} STREQUAL "CATKIN")
-
-    add_definitions(-DRUN_IN_ROS_WORKSPACE)
-
-    find_package(catkin REQUIRED COMPONENTS
-      roscpp
-      sensor_msgs
-      roslib)
-
-    catkin_package(CATKIN_DEPENDS 
-      sensor_msgs 
-      roslib)
-
-  endif(${COMPILE_METHOD} STREQUAL "CATKIN")
-
-else(roscpp_FOUND)
-
-  message(=============================================================)
-  message("-- ROS Not Found. ROS Support is turned Off.")
-  message(=============================================================)
-
-endif(roscpp_FOUND)
 
 #ROS2#
 find_package(rclcpp QUIET)
 
 if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
-
-  message(=============================================================)
-  message("-- ROS2 Found. ROS2 Support is turned On.")
-  message(=============================================================)
 
   add_definitions(-DROS2_FOUND)
   include_directories(${rclcpp_INCLUDE_DIRS})
@@ -138,13 +91,6 @@ if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
   find_package(sensor_msgs REQUIRED)
   find_package(rslidar_msg REQUIRED)
   find_package(std_msgs REQUIRED)
-#   find_package(thermal_inspection_ugv_control REQUIRED)
-
-else(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
-
-  message(=============================================================)
-  message("-- ROS2 Not Found. ROS2 Support is turned Off.")
-  message(=============================================================)
 
 endif(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
 
@@ -165,29 +111,11 @@ include_directories(${rs_driver_INCLUDE_DIRS})
 
 add_executable(rslidar_sdk_node
                node/trossen_rslidar_node.cpp
-                # node/rslidar_sdk_node.cpp
                 src/manager/node_manager.cpp)
 
-target_link_libraries(rslidar_sdk_node                   
+target_link_libraries(rslidar_sdk_node
                       ${YAML_CPP_LIBRARIES}
                       ${rs_driver_LIBRARIES})
-
-#Ros#
-if(roscpp_FOUND)
-
-  target_link_libraries(rslidar_sdk_node 
-    ${ROS_LIBS})
-
-  if(${COMPILE_METHOD} STREQUAL "CATKIN")
-
-    install(TARGETS rslidar_sdk_node
-            RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-            LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-            ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
-
-  endif()
-
-endif(roscpp_FOUND)
 
 #Ros2#
 if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")

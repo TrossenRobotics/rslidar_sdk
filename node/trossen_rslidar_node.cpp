@@ -36,7 +36,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <rclcpp/rclcpp.hpp>
 #include <rs_driver/macro/version.hpp>
 
-using namespace robosense::lidar;
+using NodeManager = robosense::lidar::NodeManager;
 
 std::mutex g_mtx;
 std::condition_variable g_cv;
@@ -47,48 +47,63 @@ static void sigHandler(int sig)
   g_cv.notify_all();
 }
 
-int main(int argc, char** argv)
+void show_usage(std::string name)
 {
-  signal(SIGINT, sigHandler);  ///< bind ctrl+c signal with the sigHandler function
+  std::cerr << "Usage: " << name << " <option(s)> SOURCES"
+            << "Options:\n"
+            << "\t--config-path\t\tPass the config file absolute path (Required argument)\n"
+            << std::endl;
+}
+
+std::string arg_parser(int argc, char * argv[])
+{
+  std::string path = "";
+  if (argc > 1) {
+    for (int i = 1; i < argc; i++) {
+      std::string arg = argv[i];
+      if (arg == "--config-path") {
+        i++;
+        path = argv[i];
+      } else {
+        i++;
+      }
+    }
+  } else {
+    std::cerr << "No input given. Resorting to default parameters\n";
+    show_usage(argv[0]);
+  }
+  return path;
+}
+
+int main(int argc, char ** argv)
+{
+  signal(SIGINT, sigHandler);  //< bind ctrl+c signal with the sigHandler function
 
   RS_TITLE << "********************************************************" << RS_REND;
-  RS_TITLE << "**********                                    **********" << RS_REND;
-  RS_TITLE << "**********    RSLidar_SDK Version: v" << RSLIDAR_VERSION_MAJOR 
-    << "." << RSLIDAR_VERSION_MINOR 
-    << "." << RSLIDAR_VERSION_PATCH << "     **********" << RS_REND;
-  RS_TITLE << "**********                                    **********" << RS_REND;
+  RS_TITLE << "**********    RSLidar_SDK Version: v" << RSLIDAR_VERSION_MAJOR
+           << "." << RSLIDAR_VERSION_MINOR
+           << "." << RSLIDAR_VERSION_PATCH << "     **********" << RS_REND;
   RS_TITLE << "********************************************************" << RS_REND;
 
   rclcpp::init(argc, argv);
 
+  // Get the YAML Config file path
   std::string config_path;
-  try
-  {
-    config_path = argv[1];
-  }
-  catch (...)
-  {
-    RS_ERROR << "Missing Config File Path" << RS_REND;
-    return -1;
+  config_path = arg_parser(argc, argv);
+  if (config_path == "") {
+    config_path = (std::string)PROJECT_PATH;
+    config_path += "/config/config.yaml";
+  } else {
+    config_path += "/rslidar.yaml";
   }
 
-// #ifdef RUN_IN_ROS_WORKSPACE
-//    config_path = ros::package::getPath("thermal_inspection_ugv_control");
-// #else
-//    config_path = (std::string)PROJECT_PATH;
-// #endif
-
-  config_path += "/rslidar.yaml";
-
+  // Read the YAML file
   YAML::Node config;
-  try
-  {
+  try {
     config = YAML::LoadFile(config_path);
-  }
-  catch (...)
-  {
+  } catch (...) {
     RS_ERROR << "The format of config file " << config_path
-      << " is wrong. Please check (e.g. indentation)." << RS_REND;
+             << " is wrong. Please check (e.g. indentation)." << RS_REND;
     return -1;
   }
 
