@@ -61,12 +61,11 @@ std::string arg_parser(int argc, char * argv[])
   if (argc > 1) {
     for (int i = 1; i < argc; i++) {
       std::string arg = argv[i];
-      if (arg == "--config-path") {
-        i++;
-        path = argv[i];
-      } else {
-        i++;
+      if (arg == "--config_filepath") {
+        path = argv[i+1];
+        return path;
       }
+      i++;
     }
   } else {
     std::cerr << "No input given. Resorting to default parameters\n";
@@ -93,8 +92,6 @@ int main(int argc, char ** argv)
   if (config_path == "") {
     config_path = static_cast<std::string>(PROJECT_PATH);
     config_path += "/config/config.yaml";
-  } else {
-    config_path += "/rslidar.yaml";
   }
 
   // Read the YAML file
