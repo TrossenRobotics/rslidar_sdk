@@ -109,25 +109,24 @@ include_directories(${rs_driver_INCLUDE_DIRS})
 # Build Setup
 #========================
 
-add_executable(rslidar_sdk_node
+add_executable(trossen_rslidar_node
                node/trossen_rslidar_node.cpp
                src/manager/node_manager.cpp)
 
-target_link_libraries(rslidar_sdk_node
+target_link_libraries(trossen_rslidar_node
                       ${YAML_CPP_LIBRARIES}
                       ${rs_driver_LIBRARIES})
 
 #Ros2#
 if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
 
-  ament_target_dependencies(rslidar_sdk_node 
+  ament_target_dependencies(trossen_rslidar_node 
     rclcpp 
     std_msgs 
     sensor_msgs 
     rslidar_msg)
 
-  install(TARGETS
-    rslidar_sdk_node
+  install(TARGETS trossen_rslidar_node
     DESTINATION lib/${PROJECT_NAME})
 
   install(DIRECTORY
