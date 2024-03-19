@@ -36,7 +36,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef ROS2_FOUND
 #include <rclcpp/rclcpp.hpp>
-#include <composable/rslidar_managed.hpp>
+#include <rslidar_managed.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp>
 #include <sstream>
 
