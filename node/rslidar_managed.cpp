@@ -1,9 +1,11 @@
-#include "rslidar_managed.hpp"
+#include "composable/rslidar_managed.hpp"
 
-namespace trossen_rslidar
+namespace robosense
+{
+namespace lidar
 {
 
-DestinationPointCloud::DestinationPointCloud(const rclcpp::NodeOptions & options)
+PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
 : nav2_util::LifecycleNode("trossen_rslidar", "", options)
 {
     declare_parameter("ros_frame_id", "rslidar");
@@ -12,11 +14,11 @@ DestinationPointCloud::DestinationPointCloud(const rclcpp::NodeOptions & options
     declare_parameter("dense_points", false);
 }
 
-DestinationPointCloud::~DestinationPointCloud()
+PointCloudLFNode::~PointCloudLFNode()
 {
 }
 
-CallbackReturn DestinationPointCloud::on_configure(const rclcpp_lifecycle::State & /* state */)
+CallbackReturn PointCloudLFNode::on_configure(const rclcpp_lifecycle::State & /* state */)
 {
   RCLCPP_DEBUG(get_logger(), "Configuring...");
 
@@ -29,7 +31,7 @@ CallbackReturn DestinationPointCloud::on_configure(const rclcpp_lifecycle::State
   return CallbackReturn::SUCCESS;
 }
 
-CallbackReturn DestinationPointCloud::on_activate(const rclcpp_lifecycle::State & /* state */)
+CallbackReturn PointCloudLFNode::on_activate(const rclcpp_lifecycle::State & /* state */)
 {
   RCLCPP_DEBUG(this->get_logger(), "Activating...");
 
@@ -37,46 +39,38 @@ CallbackReturn DestinationPointCloud::on_activate(const rclcpp_lifecycle::State 
     this->point_cloud_topic_,
     rclcpp::QoS(rclcpp::KeepLast(1)).transient_local());
 
-  YAML::Node config;
-  YAML::Node lidar_config = yamlSubNodeAbort(config, "lidar");
-  source_ = std::make_shared<SourceDriver>(SourceType::MSG_FROM_LIDAR);
-  source_->init(lidar_config[0]);
-
-  source_->regPointCloudCallback(node);
-  source_->start();
-
-
   RCLCPP_INFO(get_logger(), "Activation complete.");
   return CallbackReturn::SUCCESS;
 }
 
-void DestinationPointCloud::sendPointCloud(const LidarPointCloudMsg& msg)
+void PointCloudLFNode::sendPointCloud(const LidarPointCloudMsg& msg)
 {
   pub_pointcloud_->publish(robosense::lidar::toRosMsg(msg, frame_id_, send_by_rows_));
 }
 
-CallbackReturn DestinationPointCloud::on_deactivate(const rclcpp_lifecycle::State & /* state */)
+CallbackReturn PointCloudLFNode::on_deactivate(const rclcpp_lifecycle::State & /* state */)
 {
   RCLCPP_DEBUG(get_logger(), "Deactivating...");
   RCLCPP_INFO(get_logger(), "Deactivation complete");
   return CallbackReturn::SUCCESS;
 }
 
-CallbackReturn DestinationPointCloud::on_cleanup(const rclcpp_lifecycle::State & /* state */)
+CallbackReturn PointCloudLFNode::on_cleanup(const rclcpp_lifecycle::State & /* state */)
 {
   RCLCPP_DEBUG(get_logger(), "Cleaning up...");
   RCLCPP_INFO(get_logger(), "Cleanup complete.");
   return CallbackReturn::SUCCESS;
 }
 
-CallbackReturn DestinationPointCloud::on_shutdown(const rclcpp_lifecycle::State & /* state */)
+CallbackReturn PointCloudLFNode::on_shutdown(const rclcpp_lifecycle::State & /* state */)
 {
   RCLCPP_DEBUG(get_logger(), "Shutting down...");
   RCLCPP_INFO(get_logger(), "Shut down complete.");
   return CallbackReturn::SUCCESS;
 }
 
-}  // namespace trossen_rslidar
+}
+}
 
 #include "rclcpp_components/register_node_macro.hpp"
-RCLCPP_COMPONENTS_REGISTER_NODE(trossen_rslidar::DestinationPointCloud)
+RCLCPP_COMPONENTS_REGISTER_NODE(robosense::lidar::PointCloudLFNode)

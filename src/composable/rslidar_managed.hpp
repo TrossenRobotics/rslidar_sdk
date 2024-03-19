@@ -1,25 +1,22 @@
 #ifndef TROSSEN_RSLIDAR_HPP_
 #define TROSSEN_RSLIDAR_HPP_
 
-#include "nav2_util/lifecycle_node.hpp"
-#include <rclcpp/rclcpp.hpp>
-#include "source.hpp"
-#include "source_driver.hpp"
-#include <sensor_msgs/point_cloud2_iterator.hpp>
 #include <sstream>
-#include <rslidar_helper.hpp>
-#include "utility/yaml_reader.hpp"
 
-namespace trossen_rslidar
+#include <composable/rslidar_helper.hpp>
+#include <nav2_util/lifecycle_node.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/point_cloud2_iterator.hpp>
+#include <utility/yaml_reader.hpp>
+
+namespace robosense
+{
+namespace lidar
 {
 
 using CallbackReturn = nav2_util::CallbackReturn;
-using robosense::lidar::Source;
-using robosense::lidar::SourceType;
-using robosense::lidar::SourceDriver;
-using namespace robosense::lidar;
 
-class DestinationPointCloud : public nav2_util::LifecycleNode
+class PointCloudLFNode : public nav2_util::LifecycleNode
 {
     private:
 
@@ -34,12 +31,10 @@ class DestinationPointCloud : public nav2_util::LifecycleNode
 
     bool dense_points_;
 
-    std::shared_ptr<Source> source_;
-
     public:
-    DestinationPointCloud(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+    PointCloudLFNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
-    ~DestinationPointCloud();
+    ~PointCloudLFNode();
 
     /**
      * @brief Configure
@@ -79,6 +74,6 @@ class DestinationPointCloud : public nav2_util::LifecycleNode
 
 
 };
-
-}  // namespace trossen_rslidar
+}
+}
 #endif  // TROSSENRS_LIDAR_HPP_

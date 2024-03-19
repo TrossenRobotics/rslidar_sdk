@@ -32,15 +32,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <signal.h>
 
-#include <manager/node_manager.hpp>
+// #include <manager/node_manager.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rs_driver/macro/version.hpp>
+#include <composable/source.hpp>
 #include <composable/source_driver.hpp>
-#include <composable/rslidar_managed.hpp>
+#include <composable/source_pointcloud_ros.hpp>
 
-using NodeManager = robosense::lidar::NodeManager;
+// using NodeManager = robosense::lidar::NodeManager;
 using namespace robosense::lidar;
-using SourceDriver = robosense::lidar::SourceDriver;
 
 std::mutex g_mtx;
 std::condition_variable g_cv;
@@ -112,24 +112,15 @@ int main(int argc, char ** argv)
 //   demo_ptr->init(config);
 //   demo_ptr->start();
 
-
-  YAML::Node config;
   std::shared_ptr<Source> source_;
   YAML::Node lidar_config = yamlSubNodeAbort(config, "lidar");
-  source_ = std::make_shared<robosense::lidar::SourceDriver>(SourceType::MSG_FROM_LIDAR);
+  source_ = std::make_shared<SourceDriver>(SourceType::MSG_FROM_LIDAR);
   source_->init(lidar_config[0]);
 
-  auto options = rclcpp::NodeOptions();
-  std::shared_ptr<trossen_rslidar::DestinationPointCloud> node = std::make_shared<trossen_rslidar::DestinationPointCloud>(options);
-
-  node->configure();
-  node->activate();
-  rclcpp::spin(node->get_node_base_interface());
-  rclcpp::shutdown();
-
-  source_->regPointCloudCallback(node);
+  std::shared_ptr<DestinationPointCloud> dst = std::make_shared<DestinationPointCloudRos>();
+  dst->init(lidar_config[0]);
+  source_->regPointCloudCallback(dst);
   source_->start();
-
 
   RS_MSG << "RoboSense-LiDAR-Driver is running....." << RS_REND;
 

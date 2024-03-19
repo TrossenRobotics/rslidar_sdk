@@ -2,14 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 cmake_policy(SET CMP0048 NEW)
 project(rslidar_sdk)
 
-#=======================================
-# Custom Point Type (XYZI, XYZIRT)
-#=======================================
 set(POINT_TYPE XYZI)
-
-#=======================================
-# Compile setup (ORIGINAL, CATKIN, COLCON)
-#=======================================
 set(COMPILE_METHOD COLCON)
 
 option(ENABLE_TRANSFORM "Enable transform functions" OFF)
@@ -45,9 +38,6 @@ if(${ENABLE_SOURCE_PACKET_LEGACY})
   add_definitions("-DENABLE_SOURCE_PACKET_LEGACY")
 endif(${ENABLE_SOURCE_PACKET_LEGACY})
 
-#========================
-# Project details / setup
-#========================
 set(PROJECT_NAME rslidar_sdk)
 
 add_definitions(-DPROJECT_PATH="${PROJECT_SOURCE_DIR}")
@@ -78,24 +68,18 @@ endif()
 # Dependencies Setup
 #========================
 
-#ROS2#
+find_package(ament_cmake REQUIRED)
+find_package(nav2_util REQUIRED)
 find_package(rclcpp QUIET)
-
-if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
-
-  add_definitions(-DROS2_FOUND)
-  include_directories(${rclcpp_INCLUDE_DIRS})
-  set(CMAKE_CXX_STANDARD 14)
-
-  find_package(ament_cmake REQUIRED)
-  find_package(sensor_msgs REQUIRED)
-  find_package(rslidar_msg REQUIRED)
-  find_package(std_msgs REQUIRED)
-
-endif(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
-
-#Others#
+find_package(rclcpp_components REQUIRED)
+find_package(rslidar_msg REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(yaml-cpp REQUIRED)
+
+add_definitions(-DROS2_FOUND)
+include_directories(${rclcpp_INCLUDE_DIRS})
+set(CMAKE_CXX_STANDARD 14)
 
 #Include directory#
 include_directories(${PROJECT_SOURCE_DIR}/src)
@@ -105,36 +89,51 @@ add_subdirectory(src/rs_driver)
 find_package(rs_driver REQUIRED)
 include_directories(${rs_driver_INCLUDE_DIRS})
 
-#========================
-# Build Setup
-#========================
+set(DEPENDENCIES
+    nav2_util
+    rclcpp 
+    rclcpp_components
+    rslidar_msg
+    sensor_msgs 
+    std_msgs 
+)
 
 add_executable(trossen_rslidar_node
-               node/trossen_rslidar_node.cpp
-               src/manager/node_manager.cpp)
+               node/trossen_rslidar_compose.cpp
+)
+
+add_library(rslidar_lf_node SHARED
+    node/rslidar_managed.cpp
+)
+
+ament_target_dependencies(rslidar_lf_node
+    ${DEPENDENCIES}
+)
 
 target_link_libraries(trossen_rslidar_node
+                      rslidar_lf_node
                       ${YAML_CPP_LIBRARIES}
                       ${rs_driver_LIBRARIES})
 
-#Ros2#
-if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
+rclcpp_components_register_nodes(rslidar_lf_node "robosense::lidar::PointCloudLFNode")
 
-  ament_target_dependencies(trossen_rslidar_node 
-    rclcpp 
-    std_msgs 
-    sensor_msgs 
-    rslidar_msg)
+ament_target_dependencies(trossen_rslidar_node
+${DEPENDENCIES}
+)
 
-  install(TARGETS trossen_rslidar_node
-    DESTINATION lib/${PROJECT_NAME})
+install(
+TARGETS rslidar_lf_node
+ARCHIVE DESTINATION lib
+LIBRARY DESTINATION lib
+RUNTIME DESTINATION bin
+)
 
-  install(DIRECTORY
-    launch
-    rviz
-    DESTINATION share/${PROJECT_NAME})
+install(TARGETS trossen_rslidar_node
+RUNTIME DESTINATION lib/${PROJECT_NAME})
 
-  ament_package()
+install(DIRECTORY
+launch
+rviz
+DESTINATION share/${PROJECT_NAME})
 
-endif(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
-
+ament_package()
