@@ -141,6 +141,7 @@ install(
 
 install(
     DIRECTORY
+        config
         launch
         rviz
     DESTINATION
