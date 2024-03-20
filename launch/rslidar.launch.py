@@ -19,6 +19,7 @@ from launch.actions import (
     DeclareLaunchArgument,
     OpaqueFunction,
 )
+from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import (
     Node,
@@ -46,6 +47,14 @@ def launch_setup(context, *args, **kwargs):
                 parameters=[rslidar_config_file],
                 remappings=[],
             ),
+            # ComposableNode(
+            #     package='rviz2',
+            #     node_namespace='rviz2',
+            #     node_name='rviz2',
+            #     node_executable='rviz2',
+            #     arguments=['-d',LaunchConfiguration('rviz_config')],
+            #     condition=IfCondition(LaunchConfiguration('use_rviz'))
+            # )
         ],
         output="screen",
     )
@@ -61,19 +70,18 @@ def launch_setup(context, *args, **kwargs):
         remappings=[],
     )
 
+    # rviz_node = Node(
+    #         package='rviz2',
+    #         node_namespace='rviz2',
+    #         node_name='rviz2',
+    #         node_executable='rviz2',
+    #         arguments=['-d',LaunchConfiguration('rviz_config')],
+    #     )
+
     return [
         load_composable_nodes,
         lifecycle_manager_lidar_node,
-        # Node(
-        #     name='trossen_rslidar_node',
-        #     package='rslidar_sdk',
-        #     executable='trossen_rslidar_node',
-        #     output='screen',
-        #     parameters=[
-        #         rslidar_config_file
-        #     ],
-        #     remappings=[],
-        # )
+        # rviz_node,
     ]
 
 
@@ -85,7 +93,7 @@ def generate_launch_description():
             default_value=os.path.join(
                 get_package_share_directory('rslidar_sdk'),
                 'config',
-                'composable_config.yaml',
+                'config_ros2.yaml',
             ),
             description='Full path to the ROS 2 parameters file to use for all launched nodes',
         )
@@ -95,6 +103,25 @@ def generate_launch_description():
             'lidar_container_name',
             default_value='rslidar_container',
             description='the name of container that will contain lidar nodes',
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            'rviz_config',
+            default_value=os.path.join(
+                get_package_share_directory('rslidar_sdk'),
+                'rviz',
+                'rviz2.rviz'
+            ),
+            description='path to RViz2 config file',
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            'use_rviz',
+            default_value='true',
+            choices=('true', 'false'),
+            description='use RViz for visualization if true, disable if false.',
         )
     )
 
