@@ -1,20 +1,10 @@
-# 1 **rslidar_sdk**
-
- [中文介绍](README_CN.md) 
-
-
+# RSLiDAR SDK for ROS 2
 
 ## 1 Introduction
 
 **rslidar_sdk** is the Software Development Kit of the RoboSense Lidar based on Ubuntu. It contains:
 
-+ The lidar driver core [rs_driver](https://github.com/RoboSense-LiDAR/rs_driver),
-+ The ROS support, 
-+ The ROS2 support,
-
-To get point cloud through ROS/ROS2,  please just use this SDK. 
-
-To integrate the Lidar driver into your own projects, please use the rs_driver.
++ The lidar driver core [rs_driver](https://github.com/RoboSense-LiDAR/rs_driver) is embedded into this respository for interfacing with a Robosense LiDAR.
 
 ### 1.1 LiDAR Supported
 
@@ -37,8 +27,6 @@ To integrate the Lidar driver into your own projects, please use the rs_driver.
 
 - XYZI - x, y, z, intensity
 - XYZIRT - x, y, z, intensity, ring, timestamp
-
-
 
 ## 2 Download
 

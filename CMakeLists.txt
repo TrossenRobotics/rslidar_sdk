@@ -81,54 +81,55 @@ add_definitions(-DROS2_FOUND)
 include_directories(${rclcpp_INCLUDE_DIRS})
 set(CMAKE_CXX_STANDARD 14)
 
-#Include directory#
+# Include directory #
 include_directories(
     ${PROJECT_SOURCE_DIR}/src
     include
 )
 
-#Driver core#
+# Driver core #
 add_subdirectory(include/rs_driver)
 find_package(rs_driver REQUIRED)
 include_directories(${rs_driver_INCLUDE_DIRS})
 
 set(DEPENDENCIES
     nav2_util
-    rclcpp 
+    rclcpp
     rclcpp_components
     rslidar_msg
-    sensor_msgs 
-    std_msgs 
+    sensor_msgs
+    std_msgs
 )
 
-add_library(rslidar_lf_node SHARED
-    src/rslidar_managed.cpp
+add_library(trossen_rslidar_node SHARED
+    src/trossen_rslidar_node.cpp
+    src/rslidar_helper.cpp
 )
 
-rclcpp_components_register_nodes(rslidar_lf_node "robosense::lidar::PointCloudLFNode")
-
-ament_target_dependencies(rslidar_lf_node ${DEPENDENCIES})
-
-add_executable(trossen_rslidar_node
-               src/trossen_rslidar_compose.cpp
-)
+rclcpp_components_register_nodes(trossen_rslidar_node "robosense::lidar::PointCloudLFNode")
 
 ament_target_dependencies(trossen_rslidar_node ${DEPENDENCIES})
 
-target_link_libraries(trossen_rslidar_node
-                      rslidar_lf_node
+add_executable(trossen_rslidar_main
+               src/trossen_rslidar_main.cpp
+)
+
+ament_target_dependencies(trossen_rslidar_main ${DEPENDENCIES})
+
+target_link_libraries(trossen_rslidar_main
+                      trossen_rslidar_node
                       ${YAML_CPP_LIBRARIES}
                       ${rs_driver_LIBRARIES})
 
 install(
-    TARGETS rslidar_lf_node
+    TARGETS trossen_rslidar_node
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
 )
 
 install(
-    TARGETS trossen_rslidar_node
+    TARGETS trossen_rslidar_main
     RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 

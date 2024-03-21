@@ -1,4 +1,11 @@
-#include <rslidar_managed.hpp>
+/**
+ * Copyright 2024 Trossen Robotics - All Rights Reserved
+ *
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
+
+#include <trossen_rslidar_node.hpp>
 
 namespace robosense
 {
@@ -8,8 +15,8 @@ namespace lidar
 PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
 : nav2_util::LifecycleNode("trossen_rslidar", "", options)
 {
-    declare_parameter<std::string>("ros_frame_id", "lidar_front"); //rslidar
-    declare_parameter<std::string>("ros_send_point_cloud_topic", "points"); //rslidar_points
+    declare_parameter<std::string>("ros_frame_id", "rslidar");
+    declare_parameter<std::string>("ros_send_point_cloud_topic", "points");
     declare_parameter<bool>("ros_send_by_rows", false);
 
     // input related
@@ -118,7 +125,7 @@ CallbackReturn PointCloudLFNode::on_configure(const rclcpp_lifecycle::State & /*
 //   driver_parameters_.print();
 
   driver_ptr_.reset(new lidar::LidarDriver<LidarPointCloudMsg>());
-  driver_ptr_->regPointCloudCallback(std::bind(&PointCloudLFNode::getPointCloud, this), 
+  driver_ptr_->regPointCloudCallback(std::bind(&PointCloudLFNode::getPointCloud, this),
       std::bind(&PointCloudLFNode::putPointCloud, this, std::placeholders::_1));
   driver_ptr_->regExceptionCallback(
       std::bind(&PointCloudLFNode::putException, this, std::placeholders::_1));
@@ -231,8 +238,8 @@ CallbackReturn PointCloudLFNode::on_shutdown(const rclcpp_lifecycle::State & /* 
   return CallbackReturn::SUCCESS;
 }
 
-}
-}
+}  // namespace lidar
+}  // namespace robosense
 
 #include "rclcpp_components/register_node_macro.hpp"
 RCLCPP_COMPONENTS_REGISTER_NODE(robosense::lidar::PointCloudLFNode)

@@ -7,16 +7,16 @@
   <license>BSD</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <build_depend>nav2_util</build_depend>
-  <build_depend>launch</build_depend>
   <build_depend>launch_ros</build_depend>
-  <build_depend>rclcpp</build_depend>
+  <build_depend>launch</build_depend>
+  <build_depend>nav2_util</build_depend>
   <build_depend>rclcpp_components</build_depend>
+  <build_depend>rclcpp</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>std_msgs</build_depend>
-  <exec_depend>nav2_util</exec_depend>
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>
+  <exec_depend>nav2_util</exec_depend>
   <exec_depend>rclcpp</exec_depend>
   <exec_depend>rclcpp_components</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
