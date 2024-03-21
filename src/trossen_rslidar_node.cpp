@@ -153,6 +153,8 @@ CallbackReturn PointCloudLFNode::on_activate(const rclcpp_lifecycle::State & /* 
     this->point_cloud_topic_,
     rclcpp::QoS(rclcpp::KeepLast(1)).transient_local());
 
+  createBond();
+
   RCLCPP_INFO(get_logger(), "Activation complete.");
   return CallbackReturn::SUCCESS;
 }
@@ -219,6 +221,8 @@ CallbackReturn PointCloudLFNode::on_deactivate(const rclcpp_lifecycle::State & /
 
   to_exit_process_ = true;
   point_cloud_process_thread_.join();
+
+  destroyBond();
 
   RCLCPP_INFO(get_logger(), "Deactivation complete");
   return CallbackReturn::SUCCESS;
