@@ -45,7 +45,6 @@ def launch_setup(context, *args, **kwargs):
                 plugin='robosense::lidar::PointCloudLFNode',
                 name='trossen_rslidar_node',
                 parameters=[rslidar_config_file],
-                remappings=[],
             ),
             # ComposableNode(
             #     package='rviz2',
@@ -62,7 +61,7 @@ def launch_setup(context, *args, **kwargs):
     lifecycle_manager_lidar_node = Node(
         package='nav2_lifecycle_manager',
         executable='lifecycle_manager',
-        name='lifecycle_manager_lidar',
+        name='lifecycle_manager_rslidar',
         parameters=[
             {'autostart': True},
             {'node_names': lifecycle_nodes},
@@ -70,18 +69,19 @@ def launch_setup(context, *args, **kwargs):
         remappings=[],
     )
 
-    # rviz_node = Node(
-    #         package='rviz2',
-    #         node_namespace='rviz2',
-    #         node_name='rviz2',
-    #         node_executable='rviz2',
-    #         arguments=['-d',LaunchConfiguration('rviz_config')],
-    #     )
+    rviz_node = Node(
+        package='rviz2',
+        node_namespace='rviz2',
+        node_name='rviz2',
+        node_executable='rviz2',
+        arguments=['-d',LaunchConfiguration('rviz_config')],
+        condition=IfCondition(LaunchConfiguration('use_rviz'))
+    )
 
     return [
         load_composable_nodes,
         lifecycle_manager_lidar_node,
-        # rviz_node,
+        rviz_node,
     ]
 
 

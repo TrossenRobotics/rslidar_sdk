@@ -71,10 +71,6 @@ sensor_msgs::msg::PointCloud2 toRosMsg(
   offset = addPointField(ros_msg, "timestamp", 1, sensor_msgs::msg::PointField::FLOAT64, offset);
 #endif
 
-#if 0
-  std::cout << "off:" << offset << std::endl;
-#endif
-
   ros_msg.point_step = offset;
   ros_msg.row_step = ros_msg.width * ros_msg.point_step;
   ros_msg.is_dense = rs_msg.is_dense;

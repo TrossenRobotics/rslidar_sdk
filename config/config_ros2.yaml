@@ -1,22 +1,40 @@
 trossen_rslidar_node:
   ros__parameters:
-    ros_frame_id: rslidar                 # Frame id of packet message and point cloud message
-    ros_send_point_cloud_topic: /points       # Topic used to send point cloud through ROS
+    # Frame id of packet message and point cloud message (default: rslidar)
+    ros_frame_id: rslidar
+
+    # Topic used to send point cloud through ROS/ROS 2 (default: points)
+    ros_send_point_cloud_topic: /points
+
+    # TODO(aniketmpatil): Find relevance of this parameter (default: false)
     send_by_rows: false
+
+    # TODO(aniketmpatil): Find relevance of this parameter (default: false)
     dense_points: false
 
-    send_packet_ros: false                    # true: Send packets through ROS or ROS2(Used to record packet)
-    send_point_cloud_ros: true                # true: Send point cloud through ROS or ROS2
+    # LiDAR type - RS16, RS32, RSBP, RSHELIOS, RSHELIOS_16P, RS128, RS80, RS48, RSP128, RSP80,
+    #              RSP48, RSM1, RSM1_JUMBO, RSM2, RSE1 (default: RSHELIOS_16P)
+    lidar_type: RSHELIOS_16P
 
-    lidar_type: RSHELIOS_16P                  # LiDAR type - RS16, RS32, RSBP, RSHELIOS, RSHELIOS_16P, RS128, RS80, RS48, RSP128, RSP80, RSP48,
-                                              # RSM1, RSM1_JUMBO, RSM2, RSE1
-    msop_port: 6699                           # Msop port of lidar
-    difop_port: 7788                          # Difop port of lidar
-    start_angle: 0.0                          # Start angle of point cloud
-    end_angle: 360.0                          # End angle of point cloud
-    wait_for_difop: true
-    min_distance: 0.2                         # Minimum distance of point cloud
-    max_distance: 200.0                       # Maximum distance of point cloud
-    use_lidar_clock: false                    # True--Use the lidar clock as the message timestamp
-                                              # False-- Use the system clock as the timestamp
-    pcap_path: /home/robosense/lidar.pcap     # The path of pcap file
+    # The MSOP port to receive LiDAR packets (default: 6699)
+    msop_port: 6699
+
+    # The DIFOP port to receive LiDAR packets (default: 7788)
+    difop_port: 7788
+
+    # The start angle of the point cloud, in the range of 0~360° (default: 0.0)
+    start_angle: 0.0  # TODO(aniketmpatil): Tune
+
+    # The end angle of the point cloud, in the range of 0~360° (default: 360.0)
+    end_angle: 360.0  # TODO(aniketmpatil): Tune
+
+    # wait_for_difop: true  # TODO(aniketmpatil): Find relevance of this parameter (default: true)
+
+    # The minimum distance of the point cloud in meters (default: 0.2)
+    min_distance: 0.2  # TODO(aniketmpatil): Tune
+
+    # The maximum distance of the point cloud in meters (default: 200)
+    max_distance: 130  # TODO(aniketmpatil): Tune
+
+    # true to use the lidar clock as the message timestamp, false to use the system clock (default: false)
+    use_lidar_clock: false
