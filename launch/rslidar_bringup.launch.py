@@ -81,7 +81,7 @@ def generate_launch_description():
                 'config',
                 'trossen_rslidar_node.yaml',
             ),
-            description='Full path to the ROS 2 parameters file to use for all launched nodes',
+            description='Full path to the ROS 2 config file for rslidar driver node',
         )
     )
     declared_arguments.append(
