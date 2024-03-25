@@ -16,6 +16,9 @@ trossen_rslidar_node:
     #              RSP48, RSM1, RSM1_JUMBO, RSM2, RSE1 (default: RSHELIOS_16P)
     lidar_type: RSHELIOS_16P
 
+    # Print the driver configuration parameters (default: false)
+    show_driver_config: false
+
     # The MSOP port to receive LiDAR packets (default: 6699)
     msop_port: 6699
 

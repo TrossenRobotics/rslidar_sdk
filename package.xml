@@ -12,9 +12,10 @@
   <depend>nav2_util</depend>
   <depend>rclcpp_components</depend>
   <depend>rclcpp</depend>
+  <depend>rslidar_msg</depend>
   <depend>sensor_msgs</depend>
   <depend>std_msgs</depend>
-  <depend>rslidar_msg</depend>
+
   <export>
      <build_type>ament_cmake</build_type>
   </export>

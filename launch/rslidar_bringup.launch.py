@@ -1,8 +1,3 @@
-# Copyright 2024 Trossen Robotics - All Rights Reserved
-#
-# Unauthorized copying of this file, via any medium is strictly prohibited
-# Proprietary and confidential
-
 """
 This launch file does the following.
 
@@ -84,7 +79,7 @@ def generate_launch_description():
             default_value=os.path.join(
                 get_package_share_directory('rslidar_sdk'),
                 'config',
-                'config_ros2.yaml',
+                'trossen_rslidar_node.yaml',
             ),
             description='Full path to the ROS 2 parameters file to use for all launched nodes',
         )

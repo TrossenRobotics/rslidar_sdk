@@ -44,6 +44,7 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
     declare_parameter<std::string>("ros_frame_id", "rslidar");
     declare_parameter<std::string>("ros_send_point_cloud_topic", "points");
     declare_parameter<bool>("ros_send_by_rows", false);
+    declare_parameter<bool>("show_driver_config", false);
 
     // input related
     declare_parameter<uint16_t>("msop_port", 6699);
@@ -100,6 +101,7 @@ CallbackReturn PointCloudLFNode::on_configure(const rclcpp_lifecycle::State & /*
 
   get_parameter<std::string>("ros_send_point_cloud_topic", this->point_cloud_topic_);
   get_parameter<bool>("send_by_rows", this->send_by_rows_);
+  get_parameter<bool>("show_driver_config", this->show_driver_config_);
 
   // input related
   get_parameter<uint16_t>("msop_port", driver_parameters_.input_param.msop_port);
@@ -148,7 +150,10 @@ CallbackReturn PointCloudLFNode::on_configure(const rclcpp_lifecycle::State & /*
 
   driver_parameters_.input_type = InputType::ONLINE_LIDAR;
 
-//   driver_parameters_.print();
+  if (this->show_driver_config_)
+  {
+    driver_parameters_.print();
+  }
 
   driver_ptr_.reset(new lidar::LidarDriver<LidarPointCloudMsg>());
   driver_ptr_->regPointCloudCallback(std::bind(&PointCloudLFNode::getPointCloud, this),

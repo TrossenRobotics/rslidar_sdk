@@ -44,7 +44,6 @@ int main(int argc, char ** argv)
 
   node->configure();
   node->activate();
-  RS_MSG << "RoboSense-LiDAR-Driver is running....." << RS_REND;
 
   rclcpp::spin(node->get_node_base_interface());
   rclcpp::shutdown();

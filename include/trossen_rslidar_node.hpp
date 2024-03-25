@@ -72,6 +72,9 @@ class PointCloudLFNode : public nav2_util::LifecycleNode
     // Publish dense point cloud
     bool dense_points_;  // TODO(aniketmpatil): Analyze performance
 
+    // Flag to show lidar driver configuration on setup
+    bool show_driver_config_;
+
     // Driver Parameters to be used by RS Driver
     lidar::RSDriverParam driver_parameters_;
 
