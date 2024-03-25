@@ -4,7 +4,7 @@ trossen_rslidar_node:
     ros_frame_id: rslidar
 
     # Topic used to send point cloud through ROS/ROS 2 (default: points)
-    ros_send_point_cloud_topic: /points
+    ros_send_point_cloud_topic: /rslidar_points
 
     # TODO(aniketmpatil): Find relevance of this parameter (default: false)
     send_by_rows: false
@@ -34,7 +34,7 @@ trossen_rslidar_node:
     min_distance: 0.2  # TODO(aniketmpatil): Tune
 
     # The maximum distance of the point cloud in meters (default: 200)
-    max_distance: 130  # TODO(aniketmpatil): Tune
+    max_distance: 130.0  # TODO(aniketmpatil): Tune
 
     # true to use the lidar clock as the message timestamp, false to use the system clock (default: false)
     use_lidar_clock: false

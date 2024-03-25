@@ -46,14 +46,6 @@ def launch_setup(context, *args, **kwargs):
                 name='trossen_rslidar_node',
                 parameters=[rslidar_config_file],
             ),
-            # ComposableNode(
-            #     package='rviz2',
-            #     node_namespace='rviz2',
-            #     node_name='rviz2',
-            #     node_executable='rviz2',
-            #     arguments=['-d',LaunchConfiguration('rviz_config')],
-            #     condition=IfCondition(LaunchConfiguration('use_rviz'))
-            # )
         ],
         output="screen",
     )
@@ -70,11 +62,10 @@ def launch_setup(context, *args, **kwargs):
     )
 
     rviz_node = Node(
+        namespace='rviz2',
         package='rviz2',
-        node_namespace='rviz2',
-        node_name='rviz2',
-        node_executable='rviz2',
-        arguments=['-d',LaunchConfiguration('rviz_config')],
+        executable='rviz2',
+        arguments=['-d', LaunchConfiguration('rviz_config')],
         condition=IfCondition(LaunchConfiguration('use_rviz'))
     )
 
