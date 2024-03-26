@@ -185,7 +185,7 @@ CallbackReturn PointCloudLFNode::on_activate(const rclcpp_lifecycle::State & /* 
 
   pub_pointcloud_ = create_publisher<sensor_msgs::msg::PointCloud2>(
     this->point_cloud_topic_,
-    rclcpp::QoS(rclcpp::KeepLast(1)).transient_local());
+    rclcpp::SensorDataQoS());
 
   createBond();
 
