@@ -2,6 +2,9 @@
 Copyright (c) 2020 RoboSense
 All rights reserved
 
+Modified by: Trossen Robotics
+Copyright (c) 2024 Trossen Robotics
+
 By downloading, copying, installing or using the software you agree to this license. If you do not agree to this
 license, do not download, install, copy or use the software.
 
@@ -41,9 +44,6 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
   auto options = rclcpp::NodeOptions();
   auto node = std::make_shared<robosense::lidar::PointCloudLFNode>(options);
-
-  node->configure();
-  node->activate();
 
   rclcpp::spin(node->get_node_base_interface());
   rclcpp::shutdown();

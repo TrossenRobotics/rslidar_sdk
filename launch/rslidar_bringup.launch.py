@@ -1,3 +1,9 @@
+# Copyright (c) 2020 RoboSense
+# All rights reserved
+
+# Modified by: Trossen Robotics
+# Copyright (c) 2024 Trossen Robotics
+
 """
 This launch file does the following.
 
