@@ -103,7 +103,7 @@ CallbackReturn PointCloudLFNode::on_configure(const rclcpp_lifecycle::State & /*
   driver_parameters_.frame_id = this->frame_id_;
 
   get_parameter<std::string>("ros_send_point_cloud_topic", this->point_cloud_topic_);
-  get_parameter<bool>("send_by_rows", this->send_by_rows_);
+  get_parameter<bool>("ros_send_by_rows", this->send_by_rows_);
   get_parameter<bool>("show_driver_config", this->show_driver_config_);
 
   // input related
