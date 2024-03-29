@@ -56,7 +56,7 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
     declare_parameter<std::string>("group_address", "0.0.0.0");
     declare_parameter<bool>("use_vlan", false);
     declare_parameter<std::string>("pcap_path", "");
-    declare_parameter<float>("pcap_rate", 1);
+    declare_parameter<float>("pcap_rate", 1.0);
     declare_parameter<bool>("pcap_repeat", true);
     declare_parameter<uint16_t>("user_layer_bytes", 0);
     declare_parameter<uint16_t>("tail_layer_bytes", 0);
@@ -67,9 +67,9 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
     declare_parameter<bool>("wait_for_difop", true);
     declare_parameter<bool>("use_lidar_clock", false);
     declare_parameter<float>("min_distance", 0.2);
-    declare_parameter<float>("max_distance", 200);
-    declare_parameter<float>("start_angle", 0);
-    declare_parameter<float>("end_angle", 360);
+    declare_parameter<float>("max_distance", 200.0);
+    declare_parameter<float>("start_angle", 0.0);
+    declare_parameter<float>("end_angle", 360.0);
     declare_parameter<bool>("dense_points", false);
     declare_parameter<bool>("ts_first_point", false);
 
@@ -79,16 +79,16 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
 
     declare_parameter<uint16_t>("split_frame_mode", 1);
 
-    declare_parameter<float>("split_angle", 0);
+    declare_parameter<float>("split_angle", 0.0);
     declare_parameter<uint16_t>("num_blks_split", 0);
 
     // transform
-    declare_parameter<float>("x", 0);
-    declare_parameter<float>("y", 0);
-    declare_parameter<float>("z", 0);
-    declare_parameter<float>("roll", 0);
-    declare_parameter<float>("pitch", 0);
-    declare_parameter<float>("yaw", 0);
+    declare_parameter<float>("x", 0.0);
+    declare_parameter<float>("y", 0.0);
+    declare_parameter<float>("z", 0.0);
+    declare_parameter<float>("roll", 0.0);
+    declare_parameter<float>("pitch", 0.0);
+    declare_parameter<float>("yaw", 0.0);
 }
 
 PointCloudLFNode::~PointCloudLFNode()

@@ -4,7 +4,7 @@ trossen_rslidar_node:
     ros_frame_id: rslidar
 
     # Topic used to send point cloud through ROS/ROS 2 (default: points)
-    ros_send_point_cloud_topic: /rslidar_points
+    ros_send_point_cloud_topic: /points
 
     # Meaningful only for Mechanical Lidars, and valid if dense_points = false (default: false)
     ros_send_by_rows: false
