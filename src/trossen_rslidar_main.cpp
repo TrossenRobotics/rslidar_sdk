@@ -2,6 +2,9 @@
 Copyright (c) 2020 RoboSense
 All rights reserved
 
+Modified by: Trossen Robotics
+Copyright (c) 2024 Trossen Robotics
+
 By downloading, copying, installing or using the software you agree to this license. If you do not agree to this
 license, do not download, install, copy or use the software.
 
@@ -30,32 +33,20 @@ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWIS
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************************************************/
 
-#pragma once
+#include <signal.h>
 
-#include "utility/yaml_reader.hpp"
-#include "source/source.hpp"
+#include <rclcpp/rclcpp.hpp>
+#include <rs_driver/macro/version.hpp>
+#include <trossen_rslidar_node.hpp>
 
-namespace robosense
+int main(int argc, char ** argv)
 {
-namespace lidar
-{
+  rclcpp::init(argc, argv);
+  auto options = rclcpp::NodeOptions();
+  auto node = std::make_shared<robosense::lidar::PointCloudLFNode>(options);
 
-class NodeManager
-{
-public:
+  rclcpp::spin(node->get_node_base_interface());
+  rclcpp::shutdown();
 
-  void init(const YAML::Node& config);
-  void start();
-  void stop();
-
-  ~NodeManager();
-  NodeManager() = default;
-
-private:
-
-  std::vector<Source::Ptr> sources_;
-};
-
-}  // namespace lidar
-}  // namespace robosense
-
+  return 0;
+}
