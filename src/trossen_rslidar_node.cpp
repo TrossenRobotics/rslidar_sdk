@@ -167,7 +167,7 @@ CallbackReturn PointCloudLFNode::on_configure(const rclcpp_lifecycle::State & /*
   if (!driver_ptr_->init(driver_parameters_))
   {
     RS_ERROR << "Driver Initialize Error...." << RS_REND;
-    exit(-1);
+    return CallbackReturn::FAILURE;
   }
 
   RCLCPP_INFO(get_logger(), "Configuration complete.");
@@ -179,13 +179,16 @@ CallbackReturn PointCloudLFNode::on_activate(const rclcpp_lifecycle::State & /* 
   RCLCPP_DEBUG(this->get_logger(), "Activating...");
 
   driver_ptr_->start();
+  RCLCPP_DEBUG(this->get_logger(), "RSDriver Pointer start() complete");
 
   to_exit_process_ = false;
   point_cloud_process_thread_ = std::thread(std::bind(&PointCloudLFNode::processPointCloud, this));
 
+  RCLCPP_DEBUG(this->get_logger(), "Initializing RSLiDAR SDK point_cloud_process_thread_ and creating PointCloud publisher...");
   pub_pointcloud_ = create_publisher<sensor_msgs::msg::PointCloud2>(
     this->point_cloud_topic_,
     rclcpp::SensorDataQoS());
+  RCLCPP_DEBUG(this->get_logger(), "Thread initialized and Publisher created");
 
   createBond();
 
@@ -195,7 +198,9 @@ CallbackReturn PointCloudLFNode::on_activate(const rclcpp_lifecycle::State & /* 
 
 void PointCloudLFNode::sendPointCloud(const LidarPointCloudMsg& msg)
 {
+  RCLCPP_DEBUG(this->get_logger(), "RSLiDAR_SDK Sending PointCloud");
   pub_pointcloud_->publish(robosense::lidar::toRosMsg(msg, frame_id_, send_by_rows_));
+  RCLCPP_DEBUG(this->get_logger(), "RSLiDAR_SDK Published PointCloud");
 }
 
 std::shared_ptr<LidarPointCloudMsg> PointCloudLFNode::getPointCloud(void)
@@ -204,21 +209,25 @@ std::shared_ptr<LidarPointCloudMsg> PointCloudLFNode::getPointCloud(void)
 
   if (point_cloud.get() != NULL)
   {
+    RCLCPP_DEBUG(this->get_logger(), "RSLiDAR_SDK Get Pointcloud received and returned");
     return point_cloud;
   }
-
+  RCLCPP_DEBUG(this->get_logger(), "RSLiDAR_SDK Get Pointcloud received but was empty");
   return std::make_shared<LidarPointCloudMsg>();
 }
 
 void PointCloudLFNode::putPointCloud(std::shared_ptr<LidarPointCloudMsg> msg)
 {
   point_cloud_queue_.push(msg);
+  RCLCPP_DEBUG(this->get_logger(), "RSLiDAR_SDK Put Pointcloud received and Pushed");
 }
 
 void PointCloudLFNode::processPointCloud()
 {
+  RCLCPP_DEBUG(this->get_logger(), "RSLiDAR_SDK Processing PointCloud with conditions: ");
   while (!to_exit_process_ && rclcpp::ok())
   {
+    RCLCPP_DEBUG(this->get_logger(), "RSLiDAR_SDK Process Pointcloud Conditions met");
     std::shared_ptr<LidarPointCloudMsg> msg = point_cloud_queue_.popWait(1000);
     if (msg.get() == NULL)
     {
@@ -228,6 +237,7 @@ void PointCloudLFNode::processPointCloud()
     sendPointCloud(*msg);
 
     free_point_cloud_queue_.push(msg);
+    RCLCPP_DEBUG(this->get_logger(), "RSLiDAR_SDK Process PointCloud pushed to free queue");
   }
 }
 
