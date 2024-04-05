@@ -265,6 +265,8 @@ CallbackReturn PointCloudLFNode::on_deactivate(const rclcpp_lifecycle::State & /
 CallbackReturn PointCloudLFNode::on_cleanup(const rclcpp_lifecycle::State & /* state */)
 {
   RCLCPP_DEBUG(get_logger(), "Cleaning up...");
+  driver_ptr_.reset();
+  pub_pointcloud_.reset();
   RCLCPP_INFO(get_logger(), "Cleanup complete.");
   return CallbackReturn::SUCCESS;
 }
