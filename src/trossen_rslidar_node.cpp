@@ -252,6 +252,8 @@ CallbackReturn PointCloudLFNode::on_deactivate(const rclcpp_lifecycle::State & /
   RCLCPP_DEBUG(get_logger(), "Deactivating...");
 
   driver_ptr_->stop();
+  free_point_cloud_queue_.clear();
+  point_cloud_queue_.clear();
 
   to_exit_process_ = true;
   point_cloud_process_thread_.join();
@@ -266,6 +268,7 @@ CallbackReturn PointCloudLFNode::on_cleanup(const rclcpp_lifecycle::State & /* s
 {
   RCLCPP_DEBUG(get_logger(), "Cleaning up...");
   driver_ptr_.reset();
+  driver_parameters_ = lidar::RSDriverParam();
   pub_pointcloud_.reset();
   RCLCPP_INFO(get_logger(), "Cleanup complete.");
   return CallbackReturn::SUCCESS;
