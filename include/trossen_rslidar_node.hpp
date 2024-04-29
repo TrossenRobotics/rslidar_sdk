@@ -137,6 +137,8 @@ class PointCloudLFNode : public nav2_util::LifecycleNode
      */
     CallbackReturn on_shutdown(const rclcpp_lifecycle::State & state) override;
 
+    // CallbackReturn on_error(const rclcpp_lifecycle::State & state) override;
+
     /**
      * @brief Function to publish PointCloud2 message
      * @param msg LidarPointCloud message to be published

@@ -284,6 +284,12 @@ CallbackReturn PointCloudLFNode::on_cleanup(const rclcpp_lifecycle::State & /* s
   return CallbackReturn::SUCCESS;
 }
 
+// CallbackReturn PointCloudLFNode::on_error(const rclcpp_lifecycle::State & /* state */)
+// {
+//   RCLCPP_DEBUG(get_logger(), "Potential Error, node is now in on_error transition...");
+//   return CallbackReturn::SUCCESS;
+// }
+
 CallbackReturn PointCloudLFNode::on_shutdown(const rclcpp_lifecycle::State & /* state */)
 {
   RCLCPP_DEBUG(get_logger(), "Shutting down...");
