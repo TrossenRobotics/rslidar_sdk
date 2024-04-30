@@ -54,7 +54,9 @@ namespace robosense
 namespace lidar
 {
 
-class PointCloudLFNode : public rclcpp::Node
+using CallbackReturn = nav2_util::CallbackReturn;
+
+class PointCloudLFNode : public nav2_util::LifecycleNode
 {
     private:
     // ROS topic for publishing point cloud
@@ -100,6 +102,40 @@ class PointCloudLFNode : public rclcpp::Node
 
     // Desctructor for Lifecycle Node class
     ~PointCloudLFNode();
+
+    /**
+     * @brief Configure
+     * @return SUCCESS or FAILURE
+     */
+    CallbackReturn on_configure(const rclcpp_lifecycle::State & state) override;
+
+    /**
+     * @brief Activate
+     * @param state Reference to LifeCycle node state
+     * @return SUCCESS or FAILURE
+     */
+    CallbackReturn on_activate(const rclcpp_lifecycle::State & state) override;
+
+    /**
+     * @brief Deactivate
+     * @param state Reference to LifeCycle node state
+     * @return SUCCESS or FAILURE
+     */
+    CallbackReturn on_deactivate(const rclcpp_lifecycle::State & state) override;
+
+    /**
+     * @brief Cleanup
+     * @param state Reference to LifeCycle node state
+     * @return SUCCESS or FAILURE
+     */
+    CallbackReturn on_cleanup(const rclcpp_lifecycle::State & state) override;
+
+    /**
+     * @brief Shut down
+     * @param state Reference to LifeCycle node state
+     * @return SUCCESS or FAILURE
+     */
+    CallbackReturn on_shutdown(const rclcpp_lifecycle::State & state) override;
 
     /**
      * @brief Function to publish PointCloud2 message

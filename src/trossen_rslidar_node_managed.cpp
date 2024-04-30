@@ -42,7 +42,7 @@ namespace lidar
 {
 
 PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
-: rclcpp::Node("trossen_rslidar", "", options)
+: nav2_util::LifecycleNode("trossen_rslidar", "", options)
 {
     declare_parameter<std::string>("ros_frame_id", "rslidar");
     declare_parameter<std::string>("ros_send_point_cloud_topic", "points");
@@ -89,7 +89,15 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
     declare_parameter<float>("roll", 0.0);
     declare_parameter<float>("pitch", 0.0);
     declare_parameter<float>("yaw", 0.0);
+}
 
+PointCloudLFNode::~PointCloudLFNode()
+{
+}
+
+CallbackReturn PointCloudLFNode::on_configure(const rclcpp_lifecycle::State & /* state */)
+{
+  RCLCPP_DEBUG(get_logger(), "Configuring...");
 
   get_parameter<std::string>("ros_frame_id", this->frame_id_);
   driver_parameters_.frame_id = this->frame_id_;
@@ -162,6 +170,12 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
     exit(-1);
   }
 
+  RCLCPP_INFO(get_logger(), "Configuration complete.");
+  return CallbackReturn::SUCCESS;
+}
+
+CallbackReturn PointCloudLFNode::on_activate(const rclcpp_lifecycle::State & /* state */)
+{
   RCLCPP_DEBUG(this->get_logger(), "Activating...");
 
   driver_ptr_->start();
@@ -173,11 +187,10 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
     this->point_cloud_topic_,
     rclcpp::SensorDataQoS());
 
-  RCLCPP_INFO(get_logger(), "RSLIDAR SDK node is up.");
-}
+  createBond();
 
-PointCloudLFNode::~PointCloudLFNode()
-{
+  RCLCPP_INFO(get_logger(), "Activation complete.");
+  return CallbackReturn::SUCCESS;
 }
 
 void PointCloudLFNode::sendPointCloud(const LidarPointCloudMsg& msg)
@@ -232,6 +245,40 @@ void PointCloudLFNode::putException(const lidar::Error& msg)
       RS_ERROR << msg.toString() << RS_REND;
       break;
   }
+}
+
+CallbackReturn PointCloudLFNode::on_deactivate(const rclcpp_lifecycle::State & /* state */)
+{
+  RCLCPP_DEBUG(get_logger(), "Deactivating...");
+
+  driver_ptr_->stop();
+  free_point_cloud_queue_.clear();
+  point_cloud_queue_.clear();
+
+  to_exit_process_ = true;
+  point_cloud_process_thread_.join();
+
+  destroyBond();
+
+  RCLCPP_INFO(get_logger(), "Deactivation complete");
+  return CallbackReturn::SUCCESS;
+}
+
+CallbackReturn PointCloudLFNode::on_cleanup(const rclcpp_lifecycle::State & /* state */)
+{
+  RCLCPP_DEBUG(get_logger(), "Cleaning up...");
+  driver_ptr_.reset();
+  driver_parameters_ = lidar::RSDriverParam();
+  pub_pointcloud_.reset();
+  RCLCPP_INFO(get_logger(), "Cleanup complete.");
+  return CallbackReturn::SUCCESS;
+}
+
+CallbackReturn PointCloudLFNode::on_shutdown(const rclcpp_lifecycle::State & /* state */)
+{
+  RCLCPP_DEBUG(get_logger(), "Shutting down...");
+  RCLCPP_INFO(get_logger(), "Shut down complete.");
+  return CallbackReturn::SUCCESS;
 }
 
 }  // namespace lidar
