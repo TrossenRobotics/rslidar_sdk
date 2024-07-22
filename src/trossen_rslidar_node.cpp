@@ -44,52 +44,51 @@ namespace lidar
 PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
 : rclcpp::Node("trossen_rslidar", "", options)
 {
-    declare_parameter<std::string>("ros_frame_id", "rslidar");
-    declare_parameter<std::string>("ros_send_point_cloud_topic", "points");
-    declare_parameter<bool>("ros_send_by_rows", false);
-    declare_parameter<bool>("show_driver_config", false);
+  declare_parameter<std::string>("ros_frame_id", "rslidar");
+  declare_parameter<std::string>("ros_send_point_cloud_topic", "points");
+  declare_parameter<bool>("ros_send_by_rows", false);
+  declare_parameter<bool>("show_driver_config", false);
 
-    // input related
-    declare_parameter<uint16_t>("msop_port", 6699);
-    declare_parameter<uint16_t>("difop_port", 7788);
-    declare_parameter<std::string>("host_address", "0.0.0.0");
-    declare_parameter<std::string>("group_address", "0.0.0.0");
-    declare_parameter<bool>("use_vlan", false);
-    declare_parameter<std::string>("pcap_path", "");
-    declare_parameter<float>("pcap_rate", 1.0);
-    declare_parameter<bool>("pcap_repeat", true);
-    declare_parameter<uint16_t>("user_layer_bytes", 0);
-    declare_parameter<uint16_t>("tail_layer_bytes", 0);
+  // input related
+  declare_parameter<uint16_t>("msop_port", 6699);
+  declare_parameter<uint16_t>("difop_port", 7788);
+  declare_parameter<std::string>("host_address", "0.0.0.0");
+  declare_parameter<std::string>("group_address", "0.0.0.0");
+  declare_parameter<bool>("use_vlan", false);
+  declare_parameter<std::string>("pcap_path", "");
+  declare_parameter<float>("pcap_rate", 1.0);
+  declare_parameter<bool>("pcap_repeat", true);
+  declare_parameter<uint16_t>("user_layer_bytes", 0);
+  declare_parameter<uint16_t>("tail_layer_bytes", 0);
 
-    declare_parameter<std::string>("lidar_type", "RSHELIOS_16P");
+  declare_parameter<std::string>("lidar_type", "RSHELIOS_16P");
 
-    // decoder
-    declare_parameter<bool>("wait_for_difop", true);
-    declare_parameter<bool>("use_lidar_clock", false);
-    declare_parameter<float>("min_distance", 0.2);
-    declare_parameter<float>("max_distance", 200.0);
-    declare_parameter<float>("start_angle", 0.0);
-    declare_parameter<float>("end_angle", 360.0);
-    declare_parameter<bool>("dense_points", false);
-    declare_parameter<bool>("ts_first_point", false);
+  // decoder
+  declare_parameter<bool>("wait_for_difop", true);
+  declare_parameter<bool>("use_lidar_clock", false);
+  declare_parameter<float>("min_distance", 0.2);
+  declare_parameter<float>("max_distance", 200.0);
+  declare_parameter<float>("start_angle", 0.0);
+  declare_parameter<float>("end_angle", 360.0);
+  declare_parameter<bool>("dense_points", false);
+  declare_parameter<bool>("ts_first_point", false);
 
-    // mechanical decoder
-    declare_parameter<bool>("config_from_file", false);
-    declare_parameter<std::string>("angle_path", "");
+  // mechanical decoder
+  declare_parameter<bool>("config_from_file", false);
+  declare_parameter<std::string>("angle_path", "");
 
-    declare_parameter<uint16_t>("split_frame_mode", 1);
+  declare_parameter<uint16_t>("split_frame_mode", 1);
 
-    declare_parameter<float>("split_angle", 0.0);
-    declare_parameter<uint16_t>("num_blks_split", 0);
+  declare_parameter<float>("split_angle", 0.0);
+  declare_parameter<uint16_t>("num_blks_split", 0);
 
-    // transform
-    declare_parameter<float>("x", 0.0);
-    declare_parameter<float>("y", 0.0);
-    declare_parameter<float>("z", 0.0);
-    declare_parameter<float>("roll", 0.0);
-    declare_parameter<float>("pitch", 0.0);
-    declare_parameter<float>("yaw", 0.0);
-
+  // transform
+  declare_parameter<float>("x", 0.0);
+  declare_parameter<float>("y", 0.0);
+  declare_parameter<float>("z", 0.0);
+  declare_parameter<float>("roll", 0.0);
+  declare_parameter<float>("pitch", 0.0);
+  declare_parameter<float>("yaw", 0.0);
 
   get_parameter<std::string>("ros_frame_id", this->frame_id_);
   driver_parameters_.frame_id = this->frame_id_;

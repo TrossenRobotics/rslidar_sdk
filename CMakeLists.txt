@@ -83,8 +83,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Include directory #
 include_directories(
-    ${PROJECT_SOURCE_DIR}/src
-    include
+  ${PROJECT_SOURCE_DIR}/src
+  include
 )
 
 # Driver core #
@@ -93,17 +93,17 @@ find_package(rs_driver REQUIRED)
 include_directories(${rs_driver_INCLUDE_DIRS})
 
 set(DEPENDENCIES
-    nav2_util
-    rclcpp
-    rclcpp_components
-    rslidar_msg
-    sensor_msgs
-    std_msgs
+  nav2_util
+  rclcpp
+  rclcpp_components
+  rslidar_msg
+  sensor_msgs
+  std_msgs
 )
 
 add_library(trossen_rslidar_node SHARED
-    src/trossen_rslidar_node.cpp
-    src/rslidar_helper.cpp
+  src/trossen_rslidar_node.cpp
+  src/rslidar_helper.cpp
 )
 
 add_library(trossen_rslidar_node_managed SHARED
@@ -118,7 +118,7 @@ ament_target_dependencies(trossen_rslidar_node ${DEPENDENCIES})
 ament_target_dependencies(trossen_rslidar_node_managed ${DEPENDENCIES})
 
 add_executable(trossen_rslidar_main
-               src/trossen_rslidar_main.cpp
+  src/trossen_rslidar_main.cpp
 )
 
 ament_target_dependencies(trossen_rslidar_main ${DEPENDENCIES})
@@ -139,24 +139,24 @@ install(
 )
 
 install(
-    TARGETS trossen_rslidar_main
-    RUNTIME DESTINATION lib/${PROJECT_NAME}
+  TARGETS trossen_rslidar_main
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
 install(
-    DIRECTORY
-        include/
-    DESTINATION
-        include/
+  DIRECTORY
+    include/
+  DESTINATION
+    include/
 )
 
 install(
-    DIRECTORY
-        config
-        launch
-        rviz
-    DESTINATION
-        share/${PROJECT_NAME}
+  DIRECTORY
+    config
+    launch
+    rviz
+  DESTINATION
+    share/${PROJECT_NAME}
 )
 
 ament_package()
