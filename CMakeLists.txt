@@ -106,9 +106,16 @@ add_library(trossen_rslidar_node SHARED
     src/rslidar_helper.cpp
 )
 
+add_library(trossen_rslidar_node_managed SHARED
+  src/trossen_rslidar_node_managed.cpp
+  src/rslidar_helper.cpp
+)
+
 rclcpp_components_register_nodes(trossen_rslidar_node "robosense::lidar::PointCloudLFNode")
+rclcpp_components_register_nodes(trossen_rslidar_node_managed "robosense::lidar::PointCloudLFNodeManaged")
 
 ament_target_dependencies(trossen_rslidar_node ${DEPENDENCIES})
+ament_target_dependencies(trossen_rslidar_node_managed ${DEPENDENCIES})
 
 add_executable(trossen_rslidar_main
                src/trossen_rslidar_main.cpp
@@ -117,15 +124,18 @@ add_executable(trossen_rslidar_main
 ament_target_dependencies(trossen_rslidar_main ${DEPENDENCIES})
 
 target_link_libraries(trossen_rslidar_main
-                      trossen_rslidar_node
-                      ${YAML_CPP_LIBRARIES}
-                      ${rs_driver_LIBRARIES})
+  trossen_rslidar_node
+  ${YAML_CPP_LIBRARIES}
+  ${rs_driver_LIBRARIES}
+)
 
 install(
-    TARGETS trossen_rslidar_node
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
+  TARGETS
+    trossen_rslidar_node
+    trossen_rslidar_node_managed
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 install(
