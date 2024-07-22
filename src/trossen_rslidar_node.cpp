@@ -157,11 +157,9 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
 
   if (!driver_ptr_->init(driver_parameters_))
   {
-    RS_ERROR << "Driver Initialize Error...." << RS_REND;
-    exit(-1);
+    RCLCPP_FATAL(get_logger(), "Failed to bring up RSLIDAR SDK Node: Driver Initialize Error");
+    exit(EXIT_FAILURE);
   }
-
-  RCLCPP_DEBUG(this->get_logger(), "Activating...");
 
   driver_ptr_->start();
 
