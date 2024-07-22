@@ -56,7 +56,7 @@ namespace lidar
 
 using CallbackReturn = nav2_util::CallbackReturn;
 
-class PointCloudLFNode : public nav2_util::LifecycleNode
+class PointCloudLFNodeManaged : public nav2_util::LifecycleNode
 {
     private:
     // ROS topic for publishing point cloud
@@ -98,10 +98,10 @@ class PointCloudLFNode : public nav2_util::LifecycleNode
 
     public:
     // Constructor for LifeCycle Node class
-    explicit PointCloudLFNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+    explicit PointCloudLFNodeManaged(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
 
     // Desctructor for Lifecycle Node class
-    ~PointCloudLFNode();
+    ~PointCloudLFNodeManaged();
 
     /**
      * @brief Configure
