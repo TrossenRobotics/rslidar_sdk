@@ -175,6 +175,14 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
 
 PointCloudLFNode::~PointCloudLFNode()
 {
+  driver_ptr_->stop();
+  free_point_cloud_queue_.clear();
+  point_cloud_queue_.clear();
+
+  to_exit_process_ = true;
+  point_cloud_process_thread_.join();
+  driver_ptr_.reset();
+  pub_pointcloud_.reset();
 }
 
 void PointCloudLFNode::sendPointCloud(const LidarPointCloudMsg& msg)
