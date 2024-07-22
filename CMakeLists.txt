@@ -83,8 +83,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Include directory #
 include_directories(
-    ${PROJECT_SOURCE_DIR}/src
-    include
+  ${PROJECT_SOURCE_DIR}/src
+  include
 )
 
 # Driver core #
@@ -93,60 +93,70 @@ find_package(rs_driver REQUIRED)
 include_directories(${rs_driver_INCLUDE_DIRS})
 
 set(DEPENDENCIES
-    nav2_util
-    rclcpp
-    rclcpp_components
-    rslidar_msg
-    sensor_msgs
-    std_msgs
+  nav2_util
+  rclcpp
+  rclcpp_components
+  rslidar_msg
+  sensor_msgs
+  std_msgs
 )
 
 add_library(trossen_rslidar_node SHARED
-    src/trossen_rslidar_node.cpp
-    src/rslidar_helper.cpp
+  src/trossen_rslidar_node.cpp
+  src/rslidar_helper.cpp
+)
+
+add_library(trossen_rslidar_node_managed SHARED
+  src/trossen_rslidar_node_managed.cpp
+  src/rslidar_helper.cpp
 )
 
 rclcpp_components_register_nodes(trossen_rslidar_node "robosense::lidar::PointCloudLFNode")
+rclcpp_components_register_nodes(trossen_rslidar_node_managed "robosense::lidar::PointCloudLFNodeManaged")
 
 ament_target_dependencies(trossen_rslidar_node ${DEPENDENCIES})
+ament_target_dependencies(trossen_rslidar_node_managed ${DEPENDENCIES})
 
 add_executable(trossen_rslidar_main
-               src/trossen_rslidar_main.cpp
+  src/trossen_rslidar_main.cpp
 )
 
 ament_target_dependencies(trossen_rslidar_main ${DEPENDENCIES})
 
 target_link_libraries(trossen_rslidar_main
-                      trossen_rslidar_node
-                      ${YAML_CPP_LIBRARIES}
-                      ${rs_driver_LIBRARIES})
-
-install(
-    TARGETS trossen_rslidar_node
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
+  trossen_rslidar_node
+  ${YAML_CPP_LIBRARIES}
+  ${rs_driver_LIBRARIES}
 )
 
 install(
-    TARGETS trossen_rslidar_main
-    RUNTIME DESTINATION lib/${PROJECT_NAME}
+  TARGETS
+    trossen_rslidar_node
+    trossen_rslidar_node_managed
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 install(
-    DIRECTORY
-        include/
-    DESTINATION
-        include/
+  TARGETS trossen_rslidar_main
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
 install(
-    DIRECTORY
-        config
-        launch
-        rviz
-    DESTINATION
-        share/${PROJECT_NAME}
+  DIRECTORY
+    include/
+  DESTINATION
+    include/
+)
+
+install(
+  DIRECTORY
+    config
+    launch
+    rviz
+  DESTINATION
+    share/${PROJECT_NAME}
 )
 
 ament_package()

@@ -34,15 +34,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************************************************/
 
 
-#include <trossen_rslidar_node.hpp>
+#include <trossen_rslidar_node_managed.hpp>
 
 namespace robosense
 {
 namespace lidar
 {
 
-PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
-: rclcpp::Node("trossen_rslidar", "", options)
+PointCloudLFNodeManaged::PointCloudLFNodeManaged(const rclcpp::NodeOptions & options)
+: nav2_util::LifecycleNode("trossen_rslidar", "", options)
 {
   declare_parameter<std::string>("ros_frame_id", "rslidar");
   declare_parameter<std::string>("ros_send_point_cloud_topic", "points");
@@ -89,6 +89,15 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
   declare_parameter<float>("roll", 0.0);
   declare_parameter<float>("pitch", 0.0);
   declare_parameter<float>("yaw", 0.0);
+}
+
+PointCloudLFNodeManaged::~PointCloudLFNodeManaged()
+{
+}
+
+CallbackReturn PointCloudLFNodeManaged::on_configure(const rclcpp_lifecycle::State & /* state */)
+{
+  RCLCPP_DEBUG(get_logger(), "Configuring...");
 
   get_parameter<std::string>("ros_frame_id", this->frame_id_);
   driver_parameters_.frame_id = this->frame_id_;
@@ -150,10 +159,10 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
   }
 
   driver_ptr_.reset(new lidar::LidarDriver<LidarPointCloudMsg>());
-  driver_ptr_->regPointCloudCallback(std::bind(&PointCloudLFNode::getPointCloud, this),
-      std::bind(&PointCloudLFNode::putPointCloud, this, std::placeholders::_1));
+  driver_ptr_->regPointCloudCallback(std::bind(&PointCloudLFNodeManaged::getPointCloud, this),
+      std::bind(&PointCloudLFNodeManaged::putPointCloud, this, std::placeholders::_1));
   driver_ptr_->regExceptionCallback(
-      std::bind(&PointCloudLFNode::putException, this, std::placeholders::_1));
+      std::bind(&PointCloudLFNodeManaged::putException, this, std::placeholders::_1));
 
   if (!driver_ptr_->init(driver_parameters_))
   {
@@ -161,36 +170,35 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
     exit(EXIT_FAILURE);
   }
 
+  RCLCPP_INFO(get_logger(), "Configuration complete.");
+  return CallbackReturn::SUCCESS;
+}
+
+CallbackReturn PointCloudLFNodeManaged::on_activate(const rclcpp_lifecycle::State & /* state */)
+{
+  RCLCPP_DEBUG(this->get_logger(), "Activating...");
+
   driver_ptr_->start();
 
   to_exit_process_ = false;
-  point_cloud_process_thread_ = std::thread(std::bind(&PointCloudLFNode::processPointCloud, this));
+  point_cloud_process_thread_ = std::thread(std::bind(&PointCloudLFNodeManaged::processPointCloud, this));
 
   pub_pointcloud_ = create_publisher<sensor_msgs::msg::PointCloud2>(
     this->point_cloud_topic_,
     rclcpp::SensorDataQoS());
 
-  RCLCPP_INFO(get_logger(), "RSLIDAR SDK node is up.");
+  createBond();
+
+  RCLCPP_INFO(get_logger(), "Activation complete.");
+  return CallbackReturn::SUCCESS;
 }
 
-PointCloudLFNode::~PointCloudLFNode()
-{
-  driver_ptr_->stop();
-  free_point_cloud_queue_.clear();
-  point_cloud_queue_.clear();
-
-  to_exit_process_ = true;
-  point_cloud_process_thread_.join();
-  driver_ptr_.reset();
-  pub_pointcloud_.reset();
-}
-
-void PointCloudLFNode::sendPointCloud(const LidarPointCloudMsg& msg)
+void PointCloudLFNodeManaged::sendPointCloud(const LidarPointCloudMsg& msg)
 {
   pub_pointcloud_->publish(robosense::lidar::toRosMsg(msg, frame_id_, send_by_rows_));
 }
 
-std::shared_ptr<LidarPointCloudMsg> PointCloudLFNode::getPointCloud(void)
+std::shared_ptr<LidarPointCloudMsg> PointCloudLFNodeManaged::getPointCloud(void)
 {
   std::shared_ptr<LidarPointCloudMsg> point_cloud = free_point_cloud_queue_.pop();
 
@@ -202,12 +210,12 @@ std::shared_ptr<LidarPointCloudMsg> PointCloudLFNode::getPointCloud(void)
   return std::make_shared<LidarPointCloudMsg>();
 }
 
-void PointCloudLFNode::putPointCloud(std::shared_ptr<LidarPointCloudMsg> msg)
+void PointCloudLFNodeManaged::putPointCloud(std::shared_ptr<LidarPointCloudMsg> msg)
 {
   point_cloud_queue_.push(msg);
 }
 
-void PointCloudLFNode::processPointCloud()
+void PointCloudLFNodeManaged::processPointCloud()
 {
   while (!to_exit_process_ && rclcpp::ok())
   {
@@ -223,7 +231,7 @@ void PointCloudLFNode::processPointCloud()
   }
 }
 
-void PointCloudLFNode::putException(const lidar::Error& msg)
+void PointCloudLFNodeManaged::putException(const lidar::Error& msg)
 {
   switch (msg.error_code_type)
   {
@@ -239,8 +247,42 @@ void PointCloudLFNode::putException(const lidar::Error& msg)
   }
 }
 
+CallbackReturn PointCloudLFNodeManaged::on_deactivate(const rclcpp_lifecycle::State & /* state */)
+{
+  RCLCPP_DEBUG(get_logger(), "Deactivating...");
+
+  driver_ptr_->stop();
+  free_point_cloud_queue_.clear();
+  point_cloud_queue_.clear();
+
+  to_exit_process_ = true;
+  point_cloud_process_thread_.join();
+
+  destroyBond();
+
+  RCLCPP_INFO(get_logger(), "Deactivation complete");
+  return CallbackReturn::SUCCESS;
+}
+
+CallbackReturn PointCloudLFNodeManaged::on_cleanup(const rclcpp_lifecycle::State & /* state */)
+{
+  RCLCPP_DEBUG(get_logger(), "Cleaning up...");
+  driver_ptr_.reset();
+  driver_parameters_ = lidar::RSDriverParam();
+  pub_pointcloud_.reset();
+  RCLCPP_INFO(get_logger(), "Cleanup complete.");
+  return CallbackReturn::SUCCESS;
+}
+
+CallbackReturn PointCloudLFNodeManaged::on_shutdown(const rclcpp_lifecycle::State & /* state */)
+{
+  RCLCPP_DEBUG(get_logger(), "Shutting down...");
+  RCLCPP_INFO(get_logger(), "Shut down complete.");
+  return CallbackReturn::SUCCESS;
+}
+
 }  // namespace lidar
 }  // namespace robosense
 
 #include "rclcpp_components/register_node_macro.hpp"
-RCLCPP_COMPONENTS_REGISTER_NODE(robosense::lidar::PointCloudLFNode)
+RCLCPP_COMPONENTS_REGISTER_NODE(robosense::lidar::PointCloudLFNodeManaged)
