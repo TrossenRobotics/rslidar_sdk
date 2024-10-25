@@ -100,6 +100,18 @@ class PointCloudLFNode : public rclcpp::Node
     // Diagnostic updater - used to report status of this node and related hardware
     diagnostic_updater::Updater diagnostic_updater_;
 
+    // Minimum frequency for the pointcloud publisher - used in diagnostics
+    double minimum_frequency_;
+
+    // Maximum frequency for the pointcloud publisher - used in diagnostics
+    double maximum_frequency_;
+
+    // Tolerance with which bounds must be satisfied
+    double frequency_tolerance_;
+
+    // Number of events to consider in the statistics
+    int frequency_window_;
+
     // Diagnostic for the PointCloud2 publisher's frequency
     std::shared_ptr<diagnostic_updater::HeaderlessTopicDiagnostic> pub_pointcloud_diagnostic_;
 

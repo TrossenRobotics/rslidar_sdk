@@ -93,8 +93,10 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
 
   // diagnostic parameters
   declare_parameter<std::string>("lidar_diagnostic_name", "lidar");
-  declare_parameter<double>("minimum_frequency", 8.0);
-  declare_parameter<double>("minimum_frequency", 12.0);
+  declare_parameter<double>("minimum_frequency", 10.0);
+  declare_parameter<double>("maximum_frequency", 10.0);
+  declare_parameter<double>("frequency_tolerance", 0.1);
+  declare_parameter<int>("frequency_window", 5);
 
   get_parameter<std::string>("ros_frame_id", this->frame_id_);
   driver_parameters_.frame_id = this->frame_id_;
@@ -151,19 +153,27 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
   // diagnostic parameters
   std::string lidar_diagnostic_name;
   get_parameter<std::string>("lidar_diagnostic_name", lidar_diagnostic_name);
-  double minimum_frequency, maximum_frequency;
-  get_parameter<double>("minimum_frequency", minimum_frequency);
-  get_parameter<double>("maximum_frequency", maximum_frequency);
+  get_parameter<double>("minimum_frequency", minimum_frequency_);
+  get_parameter<double>("maximum_frequency", maximum_frequency_);
+  get_parameter<double>("frequency_tolerance", frequency_tolerance_);
+  get_parameter<int>("frequency_window", frequency_window_);
+
+  RCLCPP_INFO(
+    get_logger(),
+    "Creating diagnostic publisher for lidar '%s' with minimum frequency %f, maximum frequency %f",
+    lidar_diagnostic_name.c_str(),
+    minimum_frequency_,
+    maximum_frequency_);
 
   diagnostic_updater_.setHardwareID(lidar_diagnostic_name);
   pub_pointcloud_diagnostic_ = std::make_shared<diagnostic_updater::HeaderlessTopicDiagnostic>(
     point_cloud_topic_,
     diagnostic_updater_,
     diagnostic_updater::FrequencyStatusParam(
-      &minimum_frequency,
-      &maximum_frequency,
-      /*tolerance=*/0.1,
-      /*window_size=*/10));
+      &minimum_frequency_,
+      &maximum_frequency_,
+      frequency_tolerance_,
+      frequency_window_));
 
   driver_parameters_.input_type = InputType::ONLINE_LIDAR;
 
