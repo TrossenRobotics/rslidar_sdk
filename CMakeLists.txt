@@ -69,6 +69,8 @@ endif()
 #========================
 
 find_package(ament_cmake REQUIRED)
+find_package(diagnostic_msgs REQUIRED)
+find_package(diagnostic_updater REQUIRED)
 find_package(nav2_util REQUIRED)
 find_package(rclcpp QUIET)
 find_package(rclcpp_components REQUIRED)
@@ -93,6 +95,8 @@ find_package(rs_driver REQUIRED)
 include_directories(${rs_driver_INCLUDE_DIRS})
 
 set(DEPENDENCIES
+  diagnostic_msgs
+  diagnostic_updater
   nav2_util
   rclcpp
   rclcpp_components

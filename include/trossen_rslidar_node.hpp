@@ -41,13 +41,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <string>
 
-#include <nav2_util/lifecycle_node.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <rs_driver/api/lidar_driver.hpp>
-#include <rs_driver/utility/sync_queue.hpp>
-#include <rslidar_helper.hpp>
-#include <sensor_msgs/point_cloud2_iterator.hpp>
-#include <utility/yaml_reader.hpp>
+#include "diagnostic_msgs/msg/diagnostic_status.hpp"
+#include "diagnostic_updater/diagnostic_updater.hpp"
+#include "diagnostic_updater/publisher.hpp"
+#include "diagnostic_updater/update_functions.hpp"
+#include "rclcpp/rclcpp.hpp"
+#include "rs_driver/api/lidar_driver.hpp"
+#include "rs_driver/utility/sync_queue.hpp"
+#include "rslidar_helper.hpp"
+#include "sensor_msgs/point_cloud2_iterator.hpp"
+#include "utility/yaml_reader.hpp"
 
 namespace robosense
 {
@@ -93,6 +96,12 @@ class PointCloudLFNode : public rclcpp::Node
 
     // Flag to terminate the Process PointCloud thread
     bool to_exit_process_;
+
+    // Diagnostic updater - used to report status of this node and related hardware
+    diagnostic_updater::Updater diagnostic_updater_;
+
+    // Diagnostic for the PointCloud2 publisher's frequency
+    std::shared_ptr<diagnostic_updater::HeaderlessTopicDiagnostic> pub_pointcloud_diagnostic_;
 
     public:
     // Constructor for LifeCycle Node class
