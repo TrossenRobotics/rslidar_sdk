@@ -42,7 +42,8 @@ namespace lidar
 {
 
 PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
-: rclcpp::Node("trossen_rslidar", "", options)
+: rclcpp::Node("trossen_rslidar", "", options),
+  diagnostic_updater_(this)
 {
   declare_parameter<std::string>("ros_frame_id", "rslidar");
   declare_parameter<std::string>("ros_send_point_cloud_topic", "points");
@@ -89,6 +90,13 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
   declare_parameter<float>("roll", 0.0);
   declare_parameter<float>("pitch", 0.0);
   declare_parameter<float>("yaw", 0.0);
+
+  // diagnostic parameters
+  declare_parameter<std::string>("lidar_diagnostic_name", "lidar");
+  declare_parameter<double>("minimum_frequency", 10.0);
+  declare_parameter<double>("maximum_frequency", 10.0);
+  declare_parameter<double>("frequency_tolerance", 0.1);
+  declare_parameter<int>("frequency_window", 5);
 
   get_parameter<std::string>("ros_frame_id", this->frame_id_);
   driver_parameters_.frame_id = this->frame_id_;
@@ -142,6 +150,31 @@ PointCloudLFNode::PointCloudLFNode(const rclcpp::NodeOptions & options)
   get_parameter<float>("pitch", driver_parameters_.decoder_param.transform_param.pitch);
   get_parameter<float>("yaw", driver_parameters_.decoder_param.transform_param.yaw);
 
+  // diagnostic parameters
+  std::string lidar_diagnostic_name;
+  get_parameter<std::string>("lidar_diagnostic_name", lidar_diagnostic_name);
+  get_parameter<double>("minimum_frequency", minimum_frequency_);
+  get_parameter<double>("maximum_frequency", maximum_frequency_);
+  get_parameter<double>("frequency_tolerance", frequency_tolerance_);
+  get_parameter<int>("frequency_window", frequency_window_);
+
+  RCLCPP_INFO(
+    get_logger(),
+    "Creating diagnostic publisher for lidar '%s' with minimum frequency %f, maximum frequency %f",
+    lidar_diagnostic_name.c_str(),
+    minimum_frequency_,
+    maximum_frequency_);
+
+  diagnostic_updater_.setHardwareID(lidar_diagnostic_name);
+  pub_pointcloud_diagnostic_ = std::make_shared<diagnostic_updater::HeaderlessTopicDiagnostic>(
+    point_cloud_topic_,
+    diagnostic_updater_,
+    diagnostic_updater::FrequencyStatusParam(
+      &minimum_frequency_,
+      &maximum_frequency_,
+      frequency_tolerance_,
+      frequency_window_));
+
   driver_parameters_.input_type = InputType::ONLINE_LIDAR;
 
   if (this->show_driver_config_)
@@ -183,11 +216,13 @@ PointCloudLFNode::~PointCloudLFNode()
   point_cloud_process_thread_.join();
   driver_ptr_.reset();
   pub_pointcloud_.reset();
+  pub_pointcloud_diagnostic_.reset();
 }
 
 void PointCloudLFNode::sendPointCloud(const LidarPointCloudMsg& msg)
 {
   pub_pointcloud_->publish(robosense::lidar::toRosMsg(msg, frame_id_, send_by_rows_));
+  pub_pointcloud_diagnostic_->tick();
 }
 
 std::shared_ptr<LidarPointCloudMsg> PointCloudLFNode::getPointCloud(void)

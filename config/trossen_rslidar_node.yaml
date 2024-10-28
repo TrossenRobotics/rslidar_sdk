@@ -53,3 +53,18 @@ trossen_rslidar_node:
 
     # true to use the lidar clock as the message timestamp, false to use the system clock (default: false)
     use_lidar_clock: false
+
+    # The name of the lidar used in diagnostics (default: "lidar")
+    lidar_diagnostic_name: "lidar"
+
+    # Minimum frequency (Hz) for the pointcloud publisher - used in diagnostics (default: 10.0)
+    minimum_frequency: 10.0
+
+    # Maximum frequency (Hz) for the pointcloud publisher - used in diagnostics (default: 10.0)
+    maximum_frequency: 10.0
+
+    # Tolerance with which bounds must be satisfied (default: 0.1)
+    frequency_tolerance: 0.1
+
+    # Number of events to consider in the statistics (default: 5)
+    frequency_window: 10
